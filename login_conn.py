@@ -4,4 +4,6 @@ class LoginConn(Connection):
         self.sock = cli
     def handleRead(self):
         print("loginConn")
+        Connection.handleRead(self)
+        print(self.buf)
         self.write(self.buf)

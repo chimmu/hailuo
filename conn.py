@@ -2,7 +2,8 @@
 # import select
 # import dispatch
 class Connection:
-        
+    def __init__(self):
+        self.buf = bytes()   
     def disconnect(self):
         self.sock.close()
         
