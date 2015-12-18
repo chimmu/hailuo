@@ -1,4 +1,5 @@
 import socket
+from time import sleep
 class Client:
     def connect(self, ip, port, timeout = 1000):
         try: 
@@ -15,8 +16,15 @@ class Client:
         except Exception as e:
             print(e)
             return None
-        
+    def recv(self):
+        try:
+            self.sock.recv(1024) 
+        except Exception as e:
+            print(e)  
 if __name__ == '__main__':
     cli = Client()
     cli.connect("127.0.0.1", 9527)
-    cli.write("fuck".encode(encoding='utf_8', errors='strict'))
+    for i in range(0, 10):
+        cli.write(b'fuck')
+        sleep(1)
+        cli.recv()
