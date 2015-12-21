@@ -3,6 +3,14 @@
 # import dispatch
 import socket
 import errno
+import json
+'''
+struct head{
+int type;
+int len;
+}
+'''
+import struct
 class Connection:
     def __init__(self):
 #         self.buf = bytes()
@@ -14,6 +22,7 @@ class Connection:
         try:
             return self.sock.recv(size)
         except socket.error as e:
+            print(e)
             if e.args[0] != errno.EAGAIN:
                 self.disconnect()
             print("conn read exception")
@@ -22,14 +31,20 @@ class Connection:
         try:
             print("send sock {0}".format(self.sock))    
             return self.sock.send(buf)
-        except Exception as e:
+        except socket.error as e:
             print(e)
             return None
     def handleRead(self):
-        self.buf = self.read(2048)
-        print("Connection: {0}".format(self.buf))
-        ret = True
-        if self.buf == None:
-            ret = False
-        return ret
+        head = self.read(8)
+        try:
+            self.h = struct.unpack('!ii', head)
+        except struct.error as e:
+            return False
+        buff = self.read(self.h[0])
+        print(self.h)
+        if buff:
+            self.buf = json.loads(buff.decode('utf8'))
+            return True
+        return False
+#         print("Connection: {0}".format(self.buf))
     

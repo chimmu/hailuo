@@ -18,7 +18,7 @@ class EventModule:
     def process(self):
         if len(self.socks) <= 0:
             return
-        print(self.socks)
+#         print(self.socks)
         rfds, wfds, efds = select.select(self.socks, [], self.socks)
         for fd in rfds:
             ret = self.conns[fd].handleRead()

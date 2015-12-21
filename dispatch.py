@@ -6,6 +6,25 @@ from login_conn import LoginConn
 from conn import Connection
 from event import EventModule
 
+#todo
+class ConnRegister:
+    def __init__(self):
+        self.conns = dict()
+        pass
+    def register(self, t, conn):
+        self.conns[t] = conn
+        
+    def getConn(self, sock):
+        pass
+
+g_connReg = ConnRegister()
+
+def registConn(t, conn):
+    return g_connReg.register(t, conn)
+
+def findConn(sock):
+    return g_connReg.getConn(sock)
+
 class IPC(Connection):
     def __init__(self, sock):
 #         fds = socket.socketpair(socket.AF_INET, socket.SOCK_STREAM, 0)
@@ -64,8 +83,8 @@ class Routine:
         while True:
             cli = multiprocessing.reduction.recv_handle(self.fd)
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM, fileno = cli)
-            print("sock is {0}".format(sock))
-            conn = LoginConn(sock)
+#             conn = LoginConn(sock)
+            conn = findConn(sock)
             self.em.addConn(conn)
             self.wfd.send(b'hehe')
             print("send done...")
