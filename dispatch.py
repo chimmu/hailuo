@@ -19,11 +19,15 @@ class IPC(Connection):
     
     def handleRead(self):
         try:
-            self.sock.recv(1024)
+            print("ipc handle read...")
+            buf = self.sock.recv(1024)
+            if buf != None:
+                return True
+            return False
 #             conn = struct.unpack('s', buff)
         except Exception as e:
             print(e)
-            return None
+            return False
     
 class Routine:
     def __init__(self, fd):
@@ -60,6 +64,7 @@ class Routine:
         while True:
             cli = multiprocessing.reduction.recv_handle(self.fd)
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM, fileno = cli)
+            print("sock is {0}".format(sock))
             conn = LoginConn(sock)
             self.em.addConn(conn)
             self.wfd.send(b'hehe')

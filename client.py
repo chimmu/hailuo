@@ -18,7 +18,8 @@ class Client:
             return None
     def recv(self):
         try:
-            self.sock.recv(1024) 
+            buf = self.sock.recv(1024)
+            print(buf) 
         except Exception as e:
             print(e)  
 if __name__ == '__main__':
@@ -26,5 +27,5 @@ if __name__ == '__main__':
     cli.connect("127.0.0.1", 9527)
     for i in range(0, 10):
         cli.write(b'fuck')
-        sleep(1)
+#     sleep(1)
         cli.recv()

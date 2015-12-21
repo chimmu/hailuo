@@ -3,7 +3,10 @@ class LoginConn(Connection):
     def __init__(self, cli):
         self.sock = cli
     def handleRead(self):
-        print("loginConn")
-        Connection.handleRead(self)
-        print(self.buf)
-        self.write(self.buf)
+        ret = Connection.handleRead(self)
+        if ret == False:
+            return False
+        ret = self.write(self.buf)
+        if ret == None:
+            return False
+        return True
