@@ -28,7 +28,7 @@ if __name__ == '__main__':
     cli = Client()
     cli.connect("127.0.0.1", 9527)
 #     for i in range(0, 10):
-    msg = '{"user": "test", "passwd": "1234"}'
+    msg = '{"username": "test", "passwd": "1234"}'
     head = struct.pack('!ii',len(msg), 0)
     cli.write(head)
     cli.write(msg.encode(encoding='utf_8', errors='strict'))

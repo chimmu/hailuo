@@ -2,51 +2,26 @@ import os, sys
 import socket
 import multiprocessing
 import threading
-from login_conn import LoginConn
-from conn import Connection
+from conn import Connection, IPC
 from event import EventModule
-
-#todo
-class ConnRegister:
-    def __init__(self):
-        self.conns = dict()
-        pass
-    def register(self, t, conn):
-        self.conns[t] = conn
-        
-    def getConn(self, sock):
-        pass
-
-g_connReg = ConnRegister()
-
-def registConn(t, conn):
-    return g_connReg.register(t, conn)
-
-def findConn(sock):
-    return g_connReg.getConn(sock)
-
-class IPC(Connection):
+import mod_comm 
+class CommConn(Connection):
     def __init__(self, sock):
-#         fds = socket.socketpair(socket.AF_INET, socket.SOCK_STREAM, 0)
-#         if mode == self.READ:
-#             fds[1].close()
-#             self.fd = fds[0]
-#         else:
-#             fds[0].close()
-#             self.fd = fds[1]
         self.sock = sock
-    
     def handleRead(self):
-        try:
-            print("ipc handle read...")
-            buf = self.sock.recv(1024)
-            if buf != None:
-                return True
-            return False
-#             conn = struct.unpack('s', buff)
-        except Exception as e:
-            print(e)
-            return False
+        Connection.handleRead(self)
+        print("cmd is {0}".format(self.cmd))
+        mod = mod_comm.getModule(self.cmd)
+        return mod.handle(self, self.buf)
+#         head = self.read(8)
+#         try:
+#             self.h = struct.unpack('!ii', head)
+#         except struct.error as e:
+#             return False
+#         buff = self.read(self.h[0])
+        
+    
+
     
 class Routine:
     def __init__(self, fd):
@@ -83,8 +58,9 @@ class Routine:
         while True:
             cli = multiprocessing.reduction.recv_handle(self.fd)
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM, fileno = cli)
+            conn = CommConn(sock)
 #             conn = LoginConn(sock)
-            conn = findConn(sock)
+#             conn = findConn(sock)
             self.em.addConn(conn)
             self.wfd.send(b'hehe')
             print("send done...")
@@ -96,6 +72,7 @@ class Dispatch:
         self.cnt = pidCnt
         self.routines = []
         self.pipes = []
+        self.fds = dict()
         for i in range(0, pidCnt):
             pipe, child = multiprocessing.Pipe()
             r = Routine(child)
@@ -104,13 +81,8 @@ class Dispatch:
     def start(self):
         for i in range(0, self.cnt):
             p = multiprocessing.Process(target = self.routines[i].recvHandler)
-#             p = threading.Thread(target = self.routines[i].run)
             p.start()
     def dispatch(self, cli):
-        
-#         conn = LoginConn(cli)
         idx = cli.fileno() % self.cnt
         multiprocessing.reduction.send_handle(self.pipes[idx],cli.fileno(), self.routines[idx].pid)
-#         buf = struct.pack('s', conn)
-#         self.pipes[idx].send_
     

@@ -23,5 +23,11 @@ class DbConn:
         for item in cursor:
             print('item is {0}'.format(item))
             return passwd == item[0]
+    def getUserInfo(self, user):
+        cmd = 'select id,username,passwd from ' + self.table + ' where username="' + user + '"'
+        cursor = self.conn.cursor()
+        cursor.execute(cmd)
+        for item in cursor:
+            return item
     
 g_dbConn = DbConn('db.conf')

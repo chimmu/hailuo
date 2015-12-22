@@ -37,14 +37,37 @@ class Connection:
     def handleRead(self):
         head = self.read(8)
         try:
-            self.h = struct.unpack('!ii', head)
+            self.buflen, self.cmd = struct.unpack('!ii', head)
         except struct.error as e:
             return False
-        buff = self.read(self.h[0])
-        print(self.h)
+        buff = self.read(self.buflen)
         if buff:
             self.buf = json.loads(buff.decode('utf8'))
             return True
         return False
+    
+
+class IPC(Connection):
+    def __init__(self, sock):
+#         fds = socket.socketpair(socket.AF_INET, socket.SOCK_STREAM, 0)
+#         if mode == self.READ:
+#             fds[1].close()
+#             self.fd = fds[0]
+#         else:
+#             fds[0].close()
+#             self.fd = fds[1]
+        self.sock = sock
+    
+    def handleRead(self):
+        try:
+            print("ipc handle read...")
+            buf = self.sock.recv(1024)
+            if buf != None:
+                return True
+            return False
+#             conn = struct.unpack('s', buff)
+        except Exception as e:
+            print(e)
+            return False
 #         print("Connection: {0}".format(self.buf))
     
