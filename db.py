@@ -10,7 +10,6 @@ class DbConn:
             self.passwd = hdl['passwd']
             self.host = hdl['host']
             self.port = hdl['port']
-#     def connect(self):
             self.conn = pymysql.connect(host=self.host,
                                     port=self.port, user=self.user,
                                      password=self.passwd, charset='utf8',

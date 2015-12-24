@@ -4,7 +4,8 @@ import multiprocessing
 import threading
 from conn import Connection, IPC
 from event import EventModule
-import mod_comm 
+import mod_comm
+import modules
 class CommConn(Connection):
     def __init__(self, sock):
         self.sock = sock
@@ -13,12 +14,6 @@ class CommConn(Connection):
         print("cmd is {0}".format(self.cmd))
         mod = mod_comm.getModule(self.cmd)
         return mod.handle(self, self.buf)
-#         head = self.read(8)
-#         try:
-#             self.h = struct.unpack('!ii', head)
-#         except struct.error as e:
-#             return False
-#         buff = self.read(self.h[0])
         
     
 
@@ -50,10 +45,14 @@ class Routine:
         while True:
             print("thread.................")
             self.em.process()
+    def addModIPCs(self):
+        for ipc in mod_comm.getIpcs():
+            self.em.addConn(ipc)
     def recvHandler(self):
         self.rfd, self.wfd = socket.socketpair(socket.AF_INET, socket.SOCK_STREAM, 0)
         self.thr = threading.Thread(target = self.run)
         self.em.addConn(IPC(self.rfd))
+        self.addModIPCs()
         self.thr.start()
         while True:
             cli = multiprocessing.reduction.recv_handle(self.fd)

@@ -57,7 +57,6 @@ class IPC(Connection):
 #             fds[0].close()
 #             self.fd = fds[1]
         self.sock = sock
-    
     def handleRead(self):
         try:
             print("ipc handle read...")
