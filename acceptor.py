@@ -10,5 +10,5 @@ class Acceptor(Connection):
         self.sock.listen(1024)
     def handleRead(self):
         cli, addr = self.sock.accept()
-        cli.setblocking(0)
+#         cli.setblocking(0)
         self.dispatcher.dispatch(cli)

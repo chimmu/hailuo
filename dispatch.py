@@ -10,7 +10,8 @@ class CommConn(Connection):
     def __init__(self, sock):
         self.sock = sock
     def handleRead(self):
-        Connection.handleRead(self)
+        if Connection.handleRead(self) == False:
+            return False
         print("cmd is {0}".format(self.cmd))
         mod = mod_comm.getModule(self.cmd)
         return mod.handle(self, self.buf)
@@ -58,8 +59,6 @@ class Routine:
             cli = multiprocessing.reduction.recv_handle(self.fd)
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM, fileno = cli)
             conn = CommConn(sock)
-#             conn = LoginConn(sock)
-#             conn = findConn(sock)
             self.em.addConn(conn)
             self.wfd.send(b'hehe')
             print("send done...")
